@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lista de Tareas - To-Do List con HTML, CSS y JavaScript">
+    <title>Lista de Tareas ✅</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="app-header">
+            <h1>📝 Mi Lista de Tareas</h1>
+            <p>Organiza tu día, una tarea a la vez</p>
+        </header>
+
+        <!-- Formulario para agregar tareas -->
+        <div class="input-section">
+            <input
+                type="text"
+                id="task-input"
+                class="task-input"
+                placeholder="¿Qué necesitas hacer hoy?"
+                maxlength="100"
+            >
+            <button id="add-btn" class="add-btn" onclick="agregarTarea()">
+                + Agregar
+            </button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+            <button class="filter-btn active" id="filter-all" onclick="filtrarTareas('all')">Todas</button>
+            <button class="filter-btn" id="filter-pending" onclick="filtrarTareas('pending')">Pendientes</button>
+            <button class="filter-btn" id="filter-done" onclick="filtrarTareas('done')">Completadas</button>
+        </div>
+
+        <!-- Contador -->
+        <div class="counter">
+            <span id="counter-text">0 tareas pendientes</span>
+        </div>
+
+        <!-- Lista de tareas -->
+        <ul class="task-list" id="task-list">
+            <!-- Las tareas se generan con JavaScript -->
+        </ul>
+
+        <!-- Estado vacío -->
+        <div class="empty-state" id="empty-state">
+            <span class="empty-icon">🎉</span>
+            <p>¡No hay tareas! Agrega una arriba.</p>
+        </div>
+
+        <!-- Botón limpiar completadas -->
+        <div class="bottom-actions">
+            <button class="clear-btn" id="clear-btn" onclick="limpiarCompletadas()">
+                🗑️ Limpiar completadas
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
