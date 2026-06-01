@@ -9,29 +9,28 @@ let tareas = []; // Arreglo que guarda todas las tareas
 let filtroActual = 'all'; // Filtro activo: 'all', 'pending', 'done'
 
 // --- Elementos del DOM ---
-const taskInput    = document.getElementById('task-input');
-const taskList     = document.getElementById('task-list');
-const emptyState   = document.getElementById('empty-state');
-const counterText  = document.getElementById('counter-text');
-const clearBtn     = document.getElementById('clear-btn');
+const taskInput   = document.getElementById('task-input');
+const addBtn      = document.getElementById('add-btn');
+const taskList    = document.getElementById('task-list');
+const emptyState  = document.getElementById('empty-state');
+const counterText = document.getElementById('counter-text');
+const clearBtn    = document.getElementById('clear-btn');
 
 // =============================================
 // 1. CARGAR TAREAS al iniciar la página
 // =============================================
 function cargarTareasGuardadas() {
-    // Intentamos leer del localStorage
     const guardadas = localStorage.getItem('mis-tareas');
     if (guardadas) {
-        tareas = JSON.parse(guardadas); // Convertimos el texto JSON a un arreglo
+        tareas = JSON.parse(guardadas);
     }
-    renderizarTareas(); // Mostramos las tareas
+    renderizarTareas();
 }
 
 // =============================================
 // 2. GUARDAR TAREAS en localStorage
 // =============================================
 function guardarEnLocalStorage() {
-    // Convertimos el arreglo a texto JSON y lo guardamos
     localStorage.setItem('mis-tareas', JSON.stringify(tareas));
 }
 
@@ -39,7 +38,7 @@ function guardarEnLocalStorage() {
 // 3. AGREGAR una nueva tarea
 // =============================================
 function agregarTarea() {
-    const texto = taskInput.value.trim(); // Eliminamos espacios al inicio y al final
+    const texto = taskInput.value.trim();
 
     // Validamos que no esté vacío
     if (texto === '') {
@@ -53,32 +52,30 @@ function agregarTarea() {
 
     // Creamos el objeto de la nueva tarea
     const nuevaTarea = {
-        id: Date.now(),         // ID único basado en el tiempo
+        id: Date.now(),
         texto: texto,
         completada: false,
         fecha: new Date().toLocaleDateString('es-CL')
     };
 
-    tareas.push(nuevaTarea);    // La agregamos al arreglo
-    taskInput.value = '';       // Limpiamos el input
+    tareas.push(nuevaTarea);
+    taskInput.value = '';
     taskInput.focus();
 
-    guardarEnLocalStorage();    // Guardamos en localStorage
-    renderizarTareas();         // Actualizamos la pantalla
+    guardarEnLocalStorage();
+    renderizarTareas();
 }
 
 // =============================================
 // 4. MARCAR como completada / pendiente
 // =============================================
 function toggleTarea(id) {
-    // Buscamos la tarea por su id y cambiamos su estado
     tareas = tareas.map(tarea => {
         if (tarea.id === id) {
-            return { ...tarea, completada: !tarea.completada }; // Invertimos el estado
+            return { ...tarea, completada: !tarea.completada };
         }
         return tarea;
     });
-
     guardarEnLocalStorage();
     renderizarTareas();
 }
@@ -87,9 +84,7 @@ function toggleTarea(id) {
 // 5. ELIMINAR una tarea
 // =============================================
 function eliminarTarea(id) {
-    // Filtramos el arreglo: dejamos todo excepto la tarea con ese id
     tareas = tareas.filter(tarea => tarea.id !== id);
-
     guardarEnLocalStorage();
     renderizarTareas();
 }
@@ -104,12 +99,11 @@ function limpiarCompletadas() {
 }
 
 // =============================================
-// 7. FILTRAR tareas (todas / pendientes / completadas)
+// 7. FILTRAR tareas
 // =============================================
 function filtrarTareas(filtro) {
     filtroActual = filtro;
 
-    // Actualizar estilos de los botones de filtro
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -119,7 +113,7 @@ function filtrarTareas(filtro) {
 }
 
 // =============================================
-// 8. RENDERIZAR (mostrar) las tareas en pantalla
+// 8. RENDERIZAR las tareas en pantalla
 // =============================================
 function renderizarTareas() {
     // Filtrar según el filtro activo
@@ -134,13 +128,9 @@ function renderizarTareas() {
     taskList.innerHTML = '';
 
     // Mostrar u ocultar el estado vacío
-    if (tareasAMostrar.length === 0) {
-        emptyState.style.display = 'block';
-    } else {
-        emptyState.style.display = 'none';
-    }
+    emptyState.style.display = tareasAMostrar.length === 0 ? 'block' : 'none';
 
-    // Mostrar u ocultar botón de limpiar completadas
+    // Mostrar u ocultar el botón de limpiar completadas
     const hayCompletadas = tareas.some(t => t.completada);
     clearBtn.style.display = hayCompletadas ? 'inline-block' : 'none';
 
@@ -156,38 +146,51 @@ function renderizarTareas() {
         li.classList.add('task-item');
         if (tarea.completada) li.classList.add('completada');
 
-        li.innerHTML = `
-            <div class="task-checkbox" onclick="toggleTarea(${tarea.id})">
-                ${tarea.completada ? '✓' : ''}
-            </div>
-            <span class="task-text">${escaparHTML(tarea.texto)}</span>
-            <button class="delete-btn" onclick="eliminarTarea(${tarea.id})" title="Eliminar tarea">✕</button>
-        `;
+        // Checkbox
+        const checkbox = document.createElement('div');
+        checkbox.classList.add('task-checkbox');
+        checkbox.textContent = tarea.completada ? '✓' : '';
+        checkbox.addEventListener('click', () => toggleTarea(tarea.id));
+
+        // Texto
+        const span = document.createElement('span');
+        span.classList.add('task-text');
+        span.textContent = tarea.texto; // .textContent es seguro, no interpreta HTML
+
+        // Botón eliminar
+        const btnEliminar = document.createElement('button');
+        btnEliminar.classList.add('delete-btn');
+        btnEliminar.title = 'Eliminar tarea';
+        btnEliminar.textContent = '✕';
+        btnEliminar.addEventListener('click', () => eliminarTarea(tarea.id));
+
+        li.appendChild(checkbox);
+        li.appendChild(span);
+        li.appendChild(btnEliminar);
 
         taskList.appendChild(li);
     });
 }
 
 // =============================================
-// 9. FUNCIÓN AUXILIAR: Escapar HTML
-//    Evita que el texto del usuario se interprete como HTML
+// 9. EVENTOS: botón agregar + tecla Enter
 // =============================================
-function escaparHTML(texto) {
-    const div = document.createElement('div');
-    div.textContent = texto;
-    return div.innerHTML;
-}
+addBtn.addEventListener('click', agregarTarea);
 
-// =============================================
-// 10. PERMITIR agregar tarea con la tecla Enter
-// =============================================
 taskInput.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         agregarTarea();
     }
 });
 
+clearBtn.addEventListener('click', limpiarCompletadas);
+
+// Filtros
+document.getElementById('filter-all').addEventListener('click', () => filtrarTareas('all'));
+document.getElementById('filter-pending').addEventListener('click', () => filtrarTareas('pending'));
+document.getElementById('filter-done').addEventListener('click', () => filtrarTareas('done'));
+
 // =============================================
-// INICIO: Cargar tareas guardadas al abrir la página
+// INICIO: cargar tareas guardadas
 // =============================================
 cargarTareasGuardadas();
